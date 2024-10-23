@@ -1,0 +1,36 @@
+services:
+  backend:
+    container_name: 'backend_tg'
+    build:
+      context: .
+    networks:
+      - tg
+    env_file:
+      - ".env"
+
+  celery_worker:
+    container_name: 'celery_worker_tg'
+    build:
+      context: .
+    networks:
+      - tg
+    env_file:
+      - ".env"
+    command: "celery --app=app.tasks.celery_app:celery_instance worker -l INFO --concurrency=10"
+
+  celery_beat:
+    container_name: 'celery_beat_tg'
+    build:
+      context: .
+    networks:
+      - tg
+    env_file:
+      - ".env"
+    command: "celery --app=app.tasks.celery_app:celery_instance beat -l INFO"
+
+networks:
+  tg:
+    external: true
+
+volumes:
+  postgres_data:
